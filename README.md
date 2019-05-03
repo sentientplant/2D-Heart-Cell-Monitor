@@ -1,4 +1,4 @@
-# Heart cell monitor
+# Heart tissue monitor
 
 This holds all the scripts I would like to use to create a 2D heart cell monitor.
 
