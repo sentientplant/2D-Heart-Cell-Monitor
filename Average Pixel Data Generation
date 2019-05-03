@@ -1,0 +1,58 @@
+import numpy as np
+import cv2
+
+############DATA########################
+
+pixel_intensity_list = []
+
+########################################
+
+# Function to average 2D numpy array into one value
+def data_gen(difference):
+    average = (np.average(difference))
+    average_int = int(average)
+    return average_int
+
+#function for starting camera
+def initialize_camera(cap):
+    _, frame = cap.read()
+    return frame
+
+
+if __name__ == '__main__':
+
+    # Captures video from webcam (Should be
+    cap = cv2.VideoCapture(0)
+
+    # Grab first frame
+    first_frame = initialize_camera(cap)
+
+    while cap.isOpened():
+
+        # Grab frames for video
+        frame = initialize_camera(cap)
+
+        # Background subtraction functions
+        difference = cv2.absdiff(first_frame, frame)
+        _, difference = cv2.threshold(difference, 18, 255, cv2.THRESH_BINARY)
+
+        # Find average pixel intensity and append to list
+        avg = data_gen(difference)
+        pixel_intensity_list = np.append(avg, pixel_intensity_list)
+
+
+        # Show background subtraction
+        cv2.imshow('first frame', first_frame)
+        cv2.imshow('Original', frame)
+        cv2.imshow('difference', difference)
+
+        print(pixel_intensity_list)
+        # Press Esc key to exit video
+        key = cv2.waitKey(30) & 0xff
+        if key == 27:
+            break
+
+# Release cameras and destroy windows
+cap.release()
+cv2.destroyAllWindows()
+print('End Stream')
