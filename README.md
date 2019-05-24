@@ -4,7 +4,7 @@ This is a project I'm working on during a 2 month lab rotation in a cardiology/p
 
 ## Current progress:
 
-1) Using the Opencv background subtraction algorithm I am able to find the average pixel intensity of a video. The higher the pixel intensity the higher the displacement of cardiomyocytes. This will create peaks which show frequency.  
+* Using the Opencv background subtraction algorithm I am able to find the average pixel intensity of a video. The higher the pixel intensity the higher the displacement of cardiomyocytes. This will create peaks which show frequency.  
   https://docs.opencv.org/3.4/db/d5c/tutorial_py_bg_subtraction.html
 
 2) I Used PyQtGraph to dynamically plot the frequency by graphing mean pixel intensity obtained by the background subtraction algorithm
