@@ -23,4 +23,4 @@ This is a project I'm working on during a 2 month lab rotation in a cardiology/p
 4) Have an option to save video when you want, possibly with the video writing functions in opencv along with a toggle switch.
 
 ### Example of the current analyzer
-[Imgur](https://imgur.com/CIntY7f)
+![Imgur](https://imgur.com/CIntY7f)
