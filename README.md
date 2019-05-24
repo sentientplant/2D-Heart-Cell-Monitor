@@ -14,7 +14,7 @@ http://www.pyqtgraph.org/
 * The program will save the data when 's' is pressed to a text document with the date, FPS, and total number of frames analyzed. A figure     is also saved along with the data using matplotlib in order to quickly visualize and extract the wanted data out of the text file. 
 
 ## Current goals
-1) Clean the code, because I don't have the experience to structure proficiently
+1) Clean the code, because I don't have the experience to structure code proficiently.
 
 2) Add a PyQt button to save the data instead of pressing 's', because it is sticky and does not always save the data. 
 
