@@ -1,0 +1,190 @@
+from pyqtgraph.Qt import QtGui, QtCore
+import pyqtgraph as pg
+import collections
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import time
+import datetime
+
+# Class used to initialize camera, grab frames, and close camera
+class Camera:
+
+    def __init__(self, cam_num):
+        self.cam_num = cam_num
+        self.cap = None
+
+    def initialize(self):
+        # Grabs frames from camera or video
+        self.cap = cv2.VideoCapture(self.cam_num)
+
+    def get_frame(self):
+        # Reads and returns frame as a 2D numpy array
+        ret, self.last_frame = self.cap.read()
+        return self.last_frame
+
+    def close_camera(self):
+        self.cap.release()
+
+
+class DynamicPlotter:
+
+    def __init__(self, sampleinterval, timewindow):
+
+        # Data stuff
+        self._interval = int(sampleinterval*1000)
+        self._bufsize = int(timewindow/sampleinterval)
+        self.databuffer = collections.deque([0.0]*self._bufsize, self._bufsize)
+        self.result_array = np.array([])
+        self.x_frames = np.array([0])
+        self.x_frames_list = np.array([])
+        self.y_value_list = np.array([])
+        self.coordinate = np.array([])
+        self.x = np.linspace(-timewindow, 0.0, self._bufsize)
+        self.y = np.zeros(self._bufsize, dtype=np.float)
+        self.frame_count = np.array([0])
+
+        # Video Filter Stuff
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=300, varThreshold=25, detectShadows=False)
+
+        # Time data
+        self.time_T = False
+        self.write_V = False
+        self.pause_start = False
+        self.space = " "
+
+        # Writing video
+        self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        self.out = cv2.VideoWriter('test video.avi', self.fourcc, 15.0, (640, 480))
+
+        self.space = " "
+        self.i = 0
+        self.ii = 0
+
+        # PyQtGraph Stuff
+        self.app = QtGui.QApplication([])
+        self.plt = pg.plot(title='Dynamic Plotting with PyQtGraph')
+        self.curve = self.plt.plot(self.x, self.y, pen=(255, 255, 0))
+
+        # QTimer
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.updateplot)
+        self.timer.start(self._interval)
+
+    def pixel_intensity(self):
+        # Calculates mean pixel intensity from the foreground background mask
+        avg = (np.average(self.fgmask))
+        return avg
+
+    def image_filters(self):
+
+        # Applys the background foreground opencv algorithm to the video frames
+        self.frame = cam.get_frame()
+        self.fgmask = self.fgbg.apply(self.frame)
+        return self.fgmask
+
+    def getdata(self):
+
+        if self.time_T is False:
+            self.start_time = time.time()
+            self.time_T = True
+
+        self.fgmask = self.image_filters()
+        self.avg = self.pixel_intensity()
+
+        self.y_value_list = np.append(self.y_value_list, self.avg)
+        self.x_frames = self.x_frames + 1
+        self.x_frames_list = np.append(self.x_frames_list, self.x_frames)
+        self.coordinate = list(zip(self.x_frames_list, self.y_value_list))
+        self.frame_count = self.frame_count + 1
+        self.out.write(self.frame)
+
+        cv2.imshow('background subtract', self.fgmask)
+        cv2.imshow('original', self.frame)
+
+        # When 's' is pressed, data and video get saved
+        if cv2.waitKey(20) & 0xFF == ord('s'):
+            self.get_time()
+            self.save_data()
+            self.out.release()
+
+        return self.avg
+
+    def get_time(self):
+
+        # Calculates time it takes to acquire data, used for FPS calculation
+        self.end_time = time.time()
+        self.time_data = (self.end_time - self.start_time)
+        self.now = datetime.datetime.now()
+        self.time_T = False
+
+    def save_data(self):
+
+        # Data x and y coordinates saved to a text document
+        file1 = open("test data", "a")
+        file1.write(f"{self.now} \n")
+        file1.write(f"{self.coordinate} \n")
+        file1.write(f"{self.frame_count/self.time_data} \n")
+        file1.write(f"{self.frame_count} \n")
+        file1.write(f"{self.space} \n")
+        file1.close()
+        self.ii += 1
+        print("DATA SAVED", self.ii)
+        print(self.coordinate)
+        print(self.frame_count/self.time_data, 'FPS')
+
+        # Title of figure gives Date, FPS, Total Frame count for further analysis
+        date = str(self.now)
+        fps_title = str(self.frame_count/self.time_data)
+        frame_title = str(self.frame_count)
+        graph_title = date, fps_title, frame_title
+
+        # Graph creation
+        xs, ys = zip(*self.coordinate)
+        fig = plt.figure(figsize=(30, 10))
+        ax = fig.add_subplot(111)
+        ax.plot(xs, ys)
+        ax.tick_params(axis="x", labelsize=15)
+        ax.tick_params(axis="y", labelsize=15)
+        ax.set_xlabel("Frames", size=25)
+        ax.set_ylabel("Pixel Intensity", size=25)
+        ax.set_title(graph_title, size=25)
+
+        # Saves figure and clears it for next save
+        while True:
+            self.i += 1
+            self.newname = '{}{}.png'.format('test fig', self.i)
+            plt.savefig(self.newname)
+            plt.clf()
+            break
+
+        # Reset Variables
+        self.frame_count = np.array([0])
+        self.coordinate = np.array([])
+        self.x_frames_list = np.array([])
+        self.y_value_list = np.array([])
+
+    def updateplot(self):
+        # Appends data (mean pixel intensity) into the dynamic plot
+        self.databuffer.append(self.getdata())
+        self.y[:] = self.databuffer
+        self.curve.setData(self.x, self.y)
+        self.app.processEvents()
+
+    def run(self):
+        self.app.exec_()
+
+
+if __name__ == '__main__':
+    # Sample interval determines how quick the frames are analyzed
+    m = DynamicPlotter(sampleinterval=0.05, timewindow=5)
+
+    # Input '0' for webcam or a video file
+    cam = Camera('cardiacbody02.avi')
+    cam.initialize()
+    # Moves video windows around
+    cv2.namedWindow('original')
+    cv2.namedWindow('background subtract')
+    cv2.moveWindow('original', 1125, 300)
+    cv2.moveWindow('background subtract', 1125, 610)
+    m.run()
