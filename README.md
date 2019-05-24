@@ -20,7 +20,9 @@ http://www.pyqtgraph.org/
 
 3) Add a peak detection function which produces a sound whenever the pixel intensity peaks in the dynamic plotter. 
 
-4) Have an option to save video when you want, possibly with the video writing functions in opencv along with a toggle switch.
+4) Allow mouse interaction, letting you pick a region of interest on the origianl video window and only applying the background subtraction on that area. 
+
+5) Have an option to save video when you want, possibly with the video writing functions in opencv along with a toggle switch.
 
 ### Example of the current analyzer
 <a href="https://imgflip.com/gif/31sb1j"><img src="https://i.imgflip.com/31sb1j.gif" title="made at imgflip.com"/></a>
