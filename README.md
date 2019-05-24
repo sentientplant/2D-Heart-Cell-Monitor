@@ -23,4 +23,4 @@ This is a project I'm working on during a 2 month lab rotation in a cardiology/p
 4) Have an option to save video when you want, possibly with the video writing functions in opencv along with a toggle switch.
 
 ### Example of the current analyzer
-<iframe src="https://giphy.com/embed/Rf4auLhQMWt2hcpJg9" width="480" height="297" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/Rf4auLhQMWt2hcpJg9">via GIPHY</a></p>
+<div style="width:100%;height:0;padding-bottom:62%;position:relative;"><iframe src="https://giphy.com/embed/Rf4auLhQMWt2hcpJg9" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/Rf4auLhQMWt2hcpJg9">via GIPHY</a></p>
